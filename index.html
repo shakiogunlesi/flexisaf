@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Array Manipulation</title>
+    <style>
+        body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        transition: background-color 0.3s ease, color 0.3s ease; 
+        }
+
+        .container {
+        margin: 0 auto;
+        width: 100%;
+        padding: 20px 50px;
+        }
+
+        ul {
+        list-style-type: none;
+        padding: 0;
+        }
+
+        li {
+        background-color: #f0f0f0;
+        margin: 5px 0;
+        padding: 10px;
+        border-radius: 5px;
+        list-style: none;
+        }
+
+        button {
+        padding: 15px;
+        background-color: green;
+        color: white;
+        border: none;
+        border-radius: 15px;
+        margin: 5px;
+        transition: background-color 0.3s ease, color 0.3s ease; 
+        }
+
+        * {
+        box-sizing: border-box;
+        }
+
+        .row::after {
+        content: "";
+        clear: both;
+        display: table;
+        }
+
+        [class*="col-"] {
+        float: left;
+        padding: 15px;
+        }
+
+        .col-3 {
+        width: 25%;
+        }
+
+        .col-6 {
+        width: 50%;
+        }
+
+        .col-12 {
+        width: 100%;
+        }
+
+        .flex-container {
+        display: flex;
+        flex-wrap: wrap;
+        > div {
+            padding: 10px;
+            font-size: 30px;
+        }
+        }
+
+        @media only screen and (max-width: 600px) {
+        .container {
+            width: 100%;
+            padding: 10px 5px;
+        }
+
+        .col-6 {
+            width: 50%;
+        }
+
+        .col-3 {
+            width: 100%;
+        }
+        }
+
+        @media (min-width: 600px) and (max-width: 1200px) {
+        .col-3 {
+            width: 33.3%;
+        }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Array Manipulation</h1>
+        <p id="arrayInfo">Initial Array: <span id="arrayDisplay"></span></p>
+        
+        <button onclick="addElement()">Add Element</button>
+        <button onclick="removeElement()">Remove Element</button>
+        <button onclick="filterArray()">Filter Elements</button>
+        <button onclick="mapArray()">Map to Uppercase</button>
+        <button onclick="spliceArray()">Splice Array</button>
+        
+        <h3>Array Elements:</h3>
+        <div class="row">
+            <div class="flex-container" id="arrayList">
+                <!-- List items will be injected here -->
+            </div>
+        </div>
+        
+        <!-- Background Color Changer -->
+        <div class="input-group">
+            <h3>Change Background Color</h3>
+            <label for="bg-color">Select Background Color:</label>
+            <input type="color" id="bg-color" value="#ffffff">
+            <button onclick="changeBackgroundColor()">Apply Background</button>
+        </div>
+    </div>
+
+    <script>
+        // Initial Array
+        let fruits = ["Apple", "Banana", "Orange", "Mango", "Grapes"];
+        
+        // Function to display array in the list
+        function displayArray() {
+            const arrayList = document.getElementById("arrayList");
+            const arrayDisplay = document.getElementById("arrayDisplay");
+
+            arrayList.innerHTML = ""; // Clear the list
+            arrayDisplay.textContent = fruits.join(", ");
+            fruits.forEach(fruit => {
+                const colDiv = document.createElement("div");
+                colDiv.className = "col-3";  // Responsive column
+
+                const li = document.createElement("li");
+                li.textContent = fruit;
+                colDiv.appendChild(li);
+                arrayList.appendChild(colDiv);
+            });
+
+            console.log("Array updated:", fruits);
+        }
+
+        // Add an element to the array
+        function addElement() {
+            fruits.push("Pineapple");
+            console.log("Added element: Pineapple");
+            displayArray();
+        }
+
+        // Remove the last element from the array
+        function removeElement() {
+            const removed = fruits.pop();
+            console.log("Removed element:", removed);
+            displayArray();
+        }
+
+        // Filter array to show only elements containing the letter 'g'
+        function filterArray() {
+            const filteredFruits = fruits.filter(fruit => fruit.toLowerCase().includes('g'));
+            console.log("Filtered array (contains 'g'):", filteredFruits);
+            fruits = filteredFruits;
+            displayArray();
+        }
+
+        // Map over array to convert each element to uppercase
+        function mapArray() {
+            const uppercasedFruits = fruits.map(fruit => fruit.toUpperCase());
+            console.log("Mapped array (to uppercase):", uppercasedFruits);
+            fruits = uppercasedFruits;
+            displayArray();
+        }
+
+        // Use splice to remove 2 elements starting from index 1, and add 'Strawberry'
+        function spliceArray() {
+            fruits.splice(1, 2, "Strawberry");
+            console.log("Array after splice:", fruits);
+            displayArray();
+        }
+
+        // Function to change background, text, and button color
+        function changeBackgroundColor() {
+            const bgColor = document.getElementById('bg-color').value;
+            document.body.style.backgroundColor = bgColor;
+
+            // Calculate contrasting color (either white or black based on luminance)
+            const textColor = getContrastYIQ(bgColor);
+            
+            // Change text and button colors
+            document.body.style.color = textColor;
+
+            // Get all buttons and change their text and background color
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.style.backgroundColor = textColor === 'black' ? 'white' : 'black'; // Invert the color for button background
+                button.style.color = textColor; // Text color of the buttons
+            });
+
+            console.log("Background color changed to:", bgColor, "Text color:", textColor);
+        }
+
+        // Function to calculate whether black or white is better based on YIQ color space
+        function getContrastYIQ(hexcolor){
+            hexcolor = hexcolor.replace("#", "");
+            const r = parseInt(hexcolor.substr(0,2),16);
+            const g = parseInt(hexcolor.substr(2,2),16);
+            const b = parseInt(hexcolor.substr(4,2),16);
+            const yiq = ((r*299)+(g*587)+(b*114))/1000;
+            return (yiq >= 128) ? 'black' : '#ccc';
+        }
+
+        // Initial display of the array
+        displayArray();
+    </script>
+</body>
+</html>
